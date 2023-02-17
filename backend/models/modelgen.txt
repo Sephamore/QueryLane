@@ -1,0 +1,1 @@
+sequelize-auto -h localhost -d cqadb -u azureuser -x 1234 -p 5432 -e postgres -o "./" -l esm
