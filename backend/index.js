@@ -1,5 +1,3 @@
-import {logger} from "sequelize/lib/utils/logger";
-
 require('dotenv').config();
 import express from "express";
 import db from "./config/database.js";
