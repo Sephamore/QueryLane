@@ -1,0 +1,37 @@
+.small {
+    font-size: 0.75rem;
+}
+
+.date {
+    font-size: 0.6rem;
+}
+
+.link_spacing {
+    padding-right: 0.3rem;
+}
+
+.tag_link {
+    background-color: rgb(239, 239, 239);
+    height: auto;
+}
+
+.favorite_count {
+    margin: auto;
+    bottom: 0;
+}
+
+.action_icon {
+    color:rgb(0, 0, 0)
+}
+
+.thumb_up {
+    color: blue;
+}
+
+.thumb_down {
+    color: rgb(255, 65, 65);
+}
+
+.edit_icon {
+    color: rgb(0, 0, 0);
+}

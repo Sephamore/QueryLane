@@ -105,3 +105,7 @@ a {
     color-scheme: dark;
   }
 }
+
+.background_dbg {
+  background-color: #2f2f2f33;
+}
