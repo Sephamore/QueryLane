@@ -3,16 +3,17 @@ import { getPostData, createPost, updatePost, deletePost,
         getRecentPosts, getPostsByUser, getPostsByTags } from "../controllers/Posts.js";
 import {getVotesByUser, votePost} from "../controllers/Votes.js";
 import {getComments, createComment, deleteComment} from "../controllers/Comments.js";
+import {getLoggedInUser, login, logout, isUserNameAvailable} from "../controllers/Users.js"
 const router = express.Router();
 //MAINTAIN ALL ROUTES HERE
 
 router.get('/posts/getdata/:id', getPostData); 
 router.post('/posts/create', createPost);
 router.patch('/posts/update/', updatePost); 
-router.delete('/posts/delete/:id', deletePost); 
+router.delete('/posts/delete/:id', deletePost);
 router.get('/posts/recent/:starttime/:limit', getRecentPosts);  //starttime is timestamp (datestring also works)
 router.get('/posts/byuser/:userid/:sorting', getPostsByUser); //sorting = 'time' or 'upvotes' 
-router.get('/posts/bytags/:tags/:sorting', getPostsByTags); 
+router.get('/posts/bytags/:tags/:sorting', getPostsByTags);
  //tags without angled braces, separated by '&' such as /ubuntu&windows
 
 router.post('/votes/cast', votePost); //requires body with user_id, post_id, vote_type_id
@@ -21,5 +22,10 @@ router.get('/votes/byuser/:userid/:postid/', getVotesByUser); //postid can be "a
 router.get('/comments/bypost/:postid', getComments);
 router.post('/comments/create', createComment);
 router.delete('/comments/delete/:id', deleteComment);
+
+router.get("/login", getLoggedInUser);
+router.post("/login", login);
+router.get('/logout', logout);
+router.get("/isNameAvailable/:username", isUserNameAvailable);
 
 export default router;

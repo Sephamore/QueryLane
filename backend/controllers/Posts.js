@@ -139,7 +139,7 @@ export const getPostsByTags = async (req, res) => {
         var sorting = ['creation_date', 'DESC']; //default
         if(req.params.sorting === "upvotes"|| req.params.sorting === "upvotes_d"){ 
             sorting = ['score', 'DESC'];
-        }   
+        }
         else if (req.params.sorting === "time"|| req.params.sorting === "time_d"){ 
             sorting = ['creation_date', 'DESC'];
         }

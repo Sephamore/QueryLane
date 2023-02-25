@@ -1,12 +1,12 @@
-require('dotenv').config();
+import dotenv from "dotenv"
 import express from "express";
 import db from "./config/database.js";
 import userRoutes from "./routes/index.js";
 import cors from "cors";
 import sessions from 'express-session';
-import hash from 'sha256';
 import cookieParser from 'cookie-parser';
-import {UsersModel} from './models/init-models.js';
+
+dotenv.config()
 
 const app = express();
 try {
@@ -27,10 +27,11 @@ app.use(sessions({
    resave: false
 }));
 
+/*
 var session = null;
 
 app.get('/',async (req, res) => {
-   if(session.userId) {
+   if(session?.userId) {
       // res.sendFile();  -> send the home page
    } else {
       // res.redirect('/login');  -> redirect to the login page
@@ -40,6 +41,7 @@ app.get('/',async (req, res) => {
 app.route('/login')
     .get((req, res) => {
        // res.sendFile();  -> send the login page
+      console.log(req.session.user)
     })
     .post(async (req, res) => {
        const userId = req.body.userId;
@@ -82,6 +84,6 @@ app.get('/logout', (req, res) => {
 
    res.redirect('/');
 })
-
+*/
 app.use('/', userRoutes);
 app.listen(process.env.PORT, () => console.log('Server running at port %',process.env.PORT));
