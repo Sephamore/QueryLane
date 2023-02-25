@@ -1,0 +1,24 @@
+.small {
+    font-size: x-small;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.profile_link :hover {
+    color: blue;
+}
+
+.post_link {
+    color: rgb(30, 30, 30);
+}
+
+.post_link :hover {
+    color: green;
+}
+
+.tag_link {
+    /* color:rgb(200, 200, 200); */
+    background-color: rgb(239, 239, 239);
+    height: auto;
+}

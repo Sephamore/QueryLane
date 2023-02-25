@@ -2,10 +2,37 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
+import TopBar from '@/components/topBar'
+import PostTabPanel from '@/components/postTabPanel'
+import ButtonAppBar from '@/components/examples/app_bar'
+import ElevateAppBar from '@/components/examples/elevateAppbar'
+import { useState } from 'react'
+import Box from '@mui/material/Box'
+
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+export default function HomePage() {
+  const [ isLoggedIn, setIsLoggedIn ] = useState(true)
+  const [ username, setUsername ] = useState("abhinav")
+  const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
+
+  return (
+    <>
+      {/* <ButtonAppBar />
+      <ResponsiveAppBar /> */}
+      <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} />
+      <Box sx={{ display: "flex", justifyContent: "center"}}>
+        <Box sx={{display: "flex", width: {sx: "95%", sm: "85%", md: "75%", lg: "70%", xl: "65%" }}}>
+          <PostTabPanel isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} />
+        </Box>
+      </Box>
+    </>
+  )
+}
+
+
+export function Home() {
   return (
     <>
       <Head>
