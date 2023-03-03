@@ -7,13 +7,14 @@ import Chip from "@mui/material/Chip";
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Paper from '@mui/material/Paper'
 import { useRouter } from "next/router";
 import { ThumbUp, ThumbDown, Visibility, ContentCopy, Reply, Edit, CheckCircle, HorizontalRule, Minimize } from "@mui/icons-material";
 
 
 export function Comment({comment}) {
     return (
-        <Box sx={{mt: 1}}>
+        <Box sx={{mt: 0.8, mb: 0.8}}>
             <Box display="flex" flexDirection="row" alignItems="center">
                 <Avatar src={comment.owner_profile_image_url} sx={{mx: 1}} />
                 <Link href={`/users/${comment.userId}`} >{comment.user_display_name}</Link>
@@ -41,10 +42,12 @@ export function Comments({ comments }) {
     return (
         <Box>
             {
-                comments.map((comment) => (<>
-                    <Comment comment={comment} />
-                    <Divider component="div" sx={{ borderTopWidth: 1 }} />
-                </>
+                comments.map((comment) => (<div key={comment.id}>
+                    <Paper elevation={6} >
+                        <Comment comment={comment} />
+                    </Paper>
+                    {/* <Divider component="div" sx={{ borderTopWidth: 1 }} /> */}
+                </div>
                 ))
             }
         </Box>
@@ -69,7 +72,7 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
 
     return (
         <Box sx={{display: "flex", flexDirection: "column"}}>
-            <Box display="flex" flexDirection="row" >
+            <Box display="flex" flexDirection="row">
                 <Box
                     className={style.small}
                     display="flex"
@@ -197,9 +200,16 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
 export default function PostPreview({post, comments, accepted_answer_id, isLoggedIn, userId}) {
     return (
         <>
-            <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId}/>
+            <Box sx={{p: 1}} className={style.white_bg} >
+                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId}/>
+            </Box>
             <Divider component="div" sx={{ borderTopWidth: 1, borderColor: "ActiveBorder" }} />
-            <Comments comments={comments} />
+            <Box display="flex" flexDirection="row">
+                <Box minWidth={30} />
+                <Box sx={{ mx: 1 }}>
+                    <Comments comments={comments} />
+                </Box>
+            </Box>
         </>
     )
 }

@@ -7,6 +7,35 @@ import Box from '@mui/material/Box';
 import { Grid } from '@mui/material';
 import PostPriviewList from './postPreview';
 import List from '@mui/material/List';
+import { useState } from 'react';
+import useSWR from 'swr';
+import axios from "axios"
+
+
+const url = "http://20.193.230.163:5000"
+
+
+async function getDataByID(id){
+
+  // const response = fetch(`http://20.193.230.163:5000/posts/getdata/${id}`, {
+  //   method: "GET",
+  // }).then((res) => (
+  //   res.json()
+  // ));
+  // const a = response.json();
+
+  ids = id.join("&")
+
+  console.log(`${url}/posts/getdata/${ids}`)
+  const response = await axios.get(`${url}/posts/getdata/${ids}`)
+
+  const a = response.data
+
+  console.log(a)
+  
+  return a;
+  
+}
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -47,74 +76,60 @@ export default function PostTabPanel({isLoggedIn, username}) {
 
   const hotPosts = [
     {
-      post_id: "0",
+      id: "5",
       avatar: "/vercel.svg",
-      username: "abhinav",
-      userDisplayName: "Abinav YadavYadavYadav",
-      title: "The question The question The question The question The question The question The question The question The question The question The question The question The question The question The question The question The question ",
-      answer_count: 2,
-      tags: ["cpp", "multi_threading", "synchronization"],
-      time: "2022-10-02 12:00",
-      votes: 6
-    },
-    {
-      post_id: "1",
-      avatar: "/vercel.svg",
-      username: "yadav",
-      userDisplayName: "Yadav Abhinav",
+      owner_user_id: "5754667",
+      owner_username: "yadav",
+      owner_display_name: "Yadav Abhinav",
       title: "The question again",
       answer_count: 5,
-      tags: ["python", "multi_threading", "synchronization"],
-      time: "2022-10-02 13:00",
-      votes: 9
-    },
-    {
-      post_id: "2",
-      avatar: "/vercel.svg",
-      username: "yadav",
-      userDisplayName: "Yadav Abhinav",
-      title: "The question again",
-      answer_count: 5,
-      tags: ["python", "multi_threading", "synchronization"],
-      time: "2022-10-02 13:00",
-      votes: 9
-    },
-    {
-      post_id: "3",
-      avatar: "/vercel.svg",
-      username: "yadav",
-      userDisplayName: "Yadav Abhinav",
-      title: "The question again",
-      answer_count: 5,
-      tags: ["python", "multi_threading", "synchronization"],
-      time: "2022-10-02 13:00",
-      votes: 9
-    },
-    {
-      post_id: "4",
-      avatar: "/vercel.svg",
-      username: "yadav",
-      userDisplayName: "Yadav Abhinav",
-      title: "The question again",
-      answer_count: 5,
-      tags: ["python", "multi_threading", "synchronization"],
-      time: "2022-10-02 13:00",
-      votes: 9
-    },
-    {
-      post_id: "5",
-      avatar: "/vercel.svg",
-      username: "yadav",
-      userDisplayName: "Yadav Abhinav",
-      title: "The question again",
-      answer_count: 5,
-      tags: ["python", "multi_threading", "synchronization"],
-      time: "2022-10-02 13:00",
-      votes: 9
+      tags: "<cpp><c><python>",
+      creation_date: "2022-10-02 13:00",
+      score: 9
     },
   ]
 
-  const recentPosts = hotPosts;
+  const [recentPostIDs,setRecentPostsID] = useState([]);
+  const [recentPosts,setRecentPosts] = useState([]);
+  // start here recent post
+
+  const fetcher = async (...args) => {
+    const res = await fetch(...args)
+
+    const requestedIDs = await res.json()
+    setRecentPostsID(Object.values(requestedIDs))
+
+    console.log("IDs")
+    console.log(requestedIDs)
+
+    const tempData = []
+
+    const ids = recentPostIDs.join("&")
+
+    console.log(`${url}/posts/getdata/${ids}`)
+    const response = await axios.get(`${url}/posts/getsummary/${ids}`)
+
+    // const data = await getDataByID(recentPostIDs);
+    // for (const id of recentPostIDs) {
+    //   console.log(id)
+    //   // console.log({id, data})
+    //   tempData.push(data)
+    // }
+    console.log(response.data)
+    const data = response.data;
+    data.reverse();
+    setRecentPosts(data)
+
+    return response.data;
+  }
+  useSWR('http://20.193.230.163:5000/posts/recent/0/20',fetcher);
+  // console.log("data")
+  // console.log(data)
+
+
+  // console.log(recentPosts)
+  // return <div> Lauding...</div>
+
   const asked = hotPosts;
   const answered = hotPosts;
 
@@ -134,7 +149,7 @@ export default function PostTabPanel({isLoggedIn, username}) {
         <Grid item xs={3}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} aria-label="post tabs" >
-                <Tab label="hot" {...a11yProps(0)} />
+                <Tab label="trending" {...a11yProps(0)} />
                 <Tab label="recent" {...a11yProps(1)} />
 
                 {isLoggedIn &&

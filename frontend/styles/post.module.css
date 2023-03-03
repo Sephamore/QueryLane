@@ -35,3 +35,16 @@
 .edit_icon {
     color: rgb(0, 0, 0);
 }
+
+.comment_background {
+    background-color: rgb(227, 227, 227);
+}
+
+.white_bg {
+    background-color: white;
+}
+
+.blue_bg {
+    background-color: rgb(85, 153, 255);
+}
+
