@@ -15,14 +15,15 @@ export default function HomePage() {
   const [ isLoggedIn, setIsLoggedIn ] = useState(true)
   const [ username, setUsername ] = useState("abhinav")
   const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
+  const [ userId, setUserId ] = useState("7498")
 
   return (
     <>
-      <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} />
+      <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} />
       <Box display="flex">
         <Box flexGrow={1} />
           <Box sx={{display: "flex", width: {xs: "95%", sm: "85%", md: "75%", lg: "65%", xl: "55%"}, maxWidth: "max-content"}}>
-            <PostTabPanel isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} />
+            <PostTabPanel isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId}/>
           </Box>
         <Box flexGrow={1} />
       </Box>

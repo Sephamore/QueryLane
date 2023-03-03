@@ -71,7 +71,7 @@ function a11yProps(index) {
 }
 
 
-export default function PostTabPanel({isLoggedIn, username}) {
+export default function PostTabPanel({isLoggedIn, username, userId}) {
   const [value, setValue] = React.useState(0);
 
   const hotPosts = [
@@ -91,38 +91,83 @@ export default function PostTabPanel({isLoggedIn, username}) {
 
   const [recentPostIDs,setRecentPostsID] = useState([]);
   const [recentPosts,setRecentPosts] = useState([]);
+  const [trendingPosts,setTrendingPosts] = useState([]);
+  const [ askedByYou, setAskByYou] = useState([]);
+  const [ answeredByYou, setAnsweredByYou] = useState([]);
   // start here recent post
 
-  const fetcher = async (...args) => {
-    const res = await fetch(...args)
+  const fetcher = async (src, setter) => {
+    const res = await fetch(src)
 
     const requestedIDs = await res.json()
-    setRecentPostsID(Object.values(requestedIDs))
 
-    console.log("IDs")
-    console.log(requestedIDs)
+    const ids = Object.values(requestedIDs).join("&")
 
-    const tempData = []
-
-    const ids = recentPostIDs.join("&")
-
-    console.log(`${url}/posts/getdata/${ids}`)
     const response = await axios.get(`${url}/posts/getsummary/${ids}`)
 
-    // const data = await getDataByID(recentPostIDs);
-    // for (const id of recentPostIDs) {
-    //   console.log(id)
-    //   // console.log({id, data})
-    //   tempData.push(data)
-    // }
-    console.log(response.data)
     const data = response.data;
-    data.reverse();
-    setRecentPosts(data)
+    setter(data);
 
     return response.data;
   }
-  useSWR('http://20.193.230.163:5000/posts/recent/0/20',fetcher);
+  // const fetcher = async (src, ) => {
+  //   const res = await fetch(src)
+
+  //   const requestedIDs = await res.json()
+  //   setRecentPostsID(Object.values(requestedIDs))
+
+  //   console.log("IDs")
+  //   console.log(requestedIDs)
+
+  //   const tempData = []
+
+  //   const ids = recentPostIDs.join("&")
+
+  //   console.log(`${url}/posts/getdata/${ids}`)
+  //   const response = await axios.get(`${url}/posts/getsummary/${ids}`)
+
+  //   // const data = await getDataByID(recentPostIDs);
+  //   // for (const id of recentPostIDs) {
+  //   //   console.log(id)
+  //   //   // console.log({id, data})
+  //   //   tempData.push(data)
+  //   // }
+  //   console.log(response.data)
+  //   const data = response.data;
+  //   data.reverse();
+  //   setRecentPosts(data)
+
+  //   return response.data;
+  // }
+  useSWR('http://20.193.230.163:5000/posts/recent/0/20',async (src) => {
+    await fetcher(src, (posts) => {
+      posts.reverse();
+      setRecentPosts(posts);
+    })
+  });
+
+  useSWR('http://20.193.230.163:5000/posts/trending',(src) => {
+    fetcher(src, (posts) => {
+      posts.reverse();
+      setTrendingPosts(posts);
+    })
+  });
+
+  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/1`,(src) => {
+    console.log(src)
+    fetcher(src, (posts) => {
+      posts.reverse();
+      setAskByYou(posts);
+    })
+  });
+
+  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/2`,(src) => {
+    fetcher(src, (posts) => {
+      posts.reverse();
+      setAnsweredByYou(posts);
+    })
+  });
+
   // console.log("data")
   // console.log(data)
 
@@ -163,16 +208,16 @@ export default function PostTabPanel({isLoggedIn, username}) {
         </Grid>
       </Grid>
       <TabPanel value={value} index={0}>
-        <PostPriviewList posts={hotPosts} />
+        <PostPriviewList posts={trendingPosts} />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <PostPriviewList posts={recentPosts} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <PostPriviewList posts={asked} />
+        <PostPriviewList posts={askedByYou} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <PostPriviewList posts={answered} />
+        <PostPriviewList posts={answeredByYou} />
       </TabPanel>
     </Box>
   );

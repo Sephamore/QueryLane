@@ -20,14 +20,14 @@ export function PostPreview({ post }) {
                 {/* <ListItemAvatar sx={{ mr: 2 }}> */}
             <Box sx={{display: "flex", flexDirection:{xs: "row", md: "row" }, py: 0.5}}>
                 {/* <Box sx={{ display: "flex", flexDirection: "column", width: "auto", mx: 1, mt: 1 }} minWidth="20%" > */}
-                <Box sx={{ display: "flex", flexDirection: "column", width: {xs: "20%", md: "20%"}, mx: 1, mt: 1 }} minWidth="20%" >
+                <Box sx={{ display: "flex", flexDirection: "column", width: {xs: "10%", sm:"10%", md: "10%"}, mx: 1, mt: 1 }} minWidth="20%" >
                     <Box sx={{ display: "flex", justifyContent: "center" }} >
-                        <Avatar 
+                        <Avatar
                             alt={post.userDisplayName}
                             src={post.avatar}
                         />
                     </Box>
-                    <Link href={`/users/${post.username}`} underline="none" color="inherit"
+                    <Link href={`/users/${post.owner_user_id}`} underline="none" color="inherit"
                         className={style.profile_link} >
                             <Box sx={{ display: "flex", justifyContent: "center"}}>
                                 <Typography
@@ -81,6 +81,7 @@ export function PostPreview({ post }) {
                         {/* <Stack direction="row" spacing={0.5}> */}
                         <Box>
                             {
+                                post.tags != null &&
                                 post.tags.replaceAll("<", " ").replaceAll(">", "").split(" ").filter((str) => (str != "")).map((tag) => (
                                     <Chip className={style.tag_link} key={tag} label={tag} variant='outlined'
                                         color='default'

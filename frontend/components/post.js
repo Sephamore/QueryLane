@@ -10,6 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Paper from '@mui/material/Paper'
 import { useRouter } from "next/router";
 import { ThumbUp, ThumbDown, Visibility, ContentCopy, Reply, Edit, CheckCircle, HorizontalRule, Minimize } from "@mui/icons-material";
+import { useState } from "react";
 
 
 export function Comment({comment}) {
@@ -17,7 +18,7 @@ export function Comment({comment}) {
         <Box sx={{mt: 0.8, mb: 0.8}}>
             <Box display="flex" flexDirection="row" alignItems="center">
                 <Avatar src={comment.owner_profile_image_url} sx={{mx: 1}} />
-                <Link href={`/users/${comment.userId}`} >{comment.user_display_name}</Link>
+                <Link href={`/users/${comment.user_id}`} >{comment.user_display_name || comment.user_id}</Link>
                 <HorizontalRule sx={{ mx: 0.5 }} />
                 {format(parseISO(comment.creation_date), 'LLLL d, yyyy hh:mm a')}
             </Box>
@@ -39,10 +40,13 @@ export function Comment({comment}) {
 
 
 export function Comments({ comments }) {
+    const [ viewAll, setViewAll] = useState(true)
+    const a = []
+    a.slice
     return (
         <Box>
             {
-                comments.map((comment) => (<div key={comment.id}>
+                comments.slice(0, (!viewAll && 4) || undefined).map((comment) => (<div key={comment.id}>
                     <Paper elevation={6} >
                         <Comment comment={comment} />
                     </Paper>
@@ -82,7 +86,7 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
                 >
                     {post.post_type_id == 1 ? "Asked" : "Answered"} by 
                     <Avatar src={post.owner_profile_image_url} sx={{mx: 1}} />
-                    <Link href={`/users/${post.owner_user_id}`} className={style.link_spacing}>{post.owner_display_name}</Link> 
+                    <Link href={`/users/${post.owner_user_id}`} className={style.link_spacing}>{post.owner_display_name || post.owner_user_id}</Link> 
                     <Box  className={style.date}>at {format(parseISO(post.creation_date), 'LLLL d, yyyy hh:mm a')}</Box>
                 </Box>
                 <Box flexGrow={1}/>
@@ -105,13 +109,14 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
 
             <Divider component="div" sx={{ borderTopWidth: 1 }} />
             <Box>
-                {post.body}
+                <span dangerouslySetInnerHTML={{__html: post.body}} />
             </Box>
 
             <Divider component="div" sx={{ borderTopWidth: 1 }} />
             <Box>
                 {
-                    post.tags.map((tag) => (
+                    post.tags != null &&
+                    post.tags.replaceAll("<", " ").replaceAll(">", "").split(" ").filter((str) => (str != "")).map((tag) => (
                         <Chip className={style.tag_link} key={tag} label={tag} variant='outlined'
                             color='default'
                             onClick={() => {
@@ -132,7 +137,7 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
                     </Tooltip>
                     <Tooltip title="favorite count">
                         <div className={style.favorite_count}>
-                            {post.favorite_count}
+                            {post.score}
                         </div>
                     </Tooltip>
                     <Tooltip title="upvote">
@@ -143,15 +148,18 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
                     </Tooltip>
                 </Box>
 
-                <Tooltip title="views">
-                    <Box display="flex" flexDirection="row" >
-                        {/* <Box component="img" src="/icons/views.svg" alt="views" height={20} sx={{mt: 0.9, mr:0.3}} /> */}
-                        <Visibility sx={{mt: 0.9, mr:0.3}} />
-                        <div className={style.favorite_count}>
-                            {post.view_count}
-                        </div>
-                    </Box>
-                </Tooltip>
+                {
+                    post.post_type_id == 1 &&
+                    <Tooltip title="views">
+                        <Box display="flex" flexDirection="row" >
+                            {/* <Box component="img" src="/icons/views.svg" alt="views" height={20} sx={{mt: 0.9, mr:0.3}} /> */}
+                            <Visibility sx={{mt: 0.9, mr:0.3}} />
+                            <div className={style.favorite_count}>
+                                {post.view_count}
+                            </div>
+                        </Box>
+                    </Tooltip>
+                }
                 <Box flexGrow={1} />
                 {
                     accepted_answer_id == post.id
@@ -197,9 +205,9 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
 }
 
 
-export default function PostPreview({post, comments, accepted_answer_id, isLoggedIn, userId}) {
+export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId}) {
     return (
-        <>
+        <Box>
             <Box sx={{p: 1}} className={style.white_bg} >
                 <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId}/>
             </Box>
@@ -210,6 +218,6 @@ export default function PostPreview({post, comments, accepted_answer_id, isLogge
                     <Comments comments={comments} />
                 </Box>
             </Box>
-        </>
+        </Box>
     )
 }
