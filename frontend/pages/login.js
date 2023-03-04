@@ -12,30 +12,31 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import {useState} from 'react';
+import axios from 'axios'
+import { backend } from '@/query.config.js'
+import {useRouter} from 'next/router'
 
 const theme = createTheme();
 
 export default function Login() {
-  const handleSubmit = (event) => {
+  const router = useRouter()
+
+  const [ username, setUsername ] = useState("User_6")
+  const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
+  const [ password, setPassword ] = useState('User_6')
+  const [ status, setStatus ] = useState(false)
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
+    const res = await axios.post(`${backend}/login`, {
+      username: username,
+      password: password
     });
+    console.log(res.data)
+    if (res.data.status == 'OK') {
+      // router.push("/")
+    }
   };
 
   return (
@@ -66,6 +67,12 @@ export default function Login() {
               name="username"
               autoComplete="username"
               autoFocus
+              value={username}
+              onChange={
+                (event) => {
+                  setUsername(event.target.value)
+                }
+              }
             />
             <TextField
               margin="normal"
@@ -76,10 +83,20 @@ export default function Login() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={password}
+              onChange={
+                (event) => {
+                  setPassword(event.target.value)
+                }
+              }
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value={status} color="primary" />}
               label="Remember me"
+              value={status}
+              onChange={(event) => {
+                setStatus(event.target.value)
+              }}
             />
             <Button
               type="submit"

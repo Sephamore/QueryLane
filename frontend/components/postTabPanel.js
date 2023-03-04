@@ -154,18 +154,23 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
   });
 
   useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/1`,(src) => {
-    console.log(src)
-    fetcher(src, (posts) => {
-      posts.reverse();
-      setAskByYou(posts);
-    })
+    if (isLoggedIn){
+      fetcher(src, (posts) => {
+        console.log(posts)
+        posts.reverse();
+        setAskByYou(posts);
+      })
+    }
   });
 
   useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/2`,(src) => {
-    fetcher(src, (posts) => {
-      posts.reverse();
-      setAnsweredByYou(posts);
+    if (isLoggedIn){
+      fetcher(src, (posts) => {
+        posts.reverse();
+        setAnsweredByYou(posts);
     })
+    }
+
   });
 
   // console.log("data")

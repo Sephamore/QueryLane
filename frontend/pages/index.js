@@ -6,16 +6,37 @@ import TopBar from '@/components/topBar'
 import PostTabPanel from '@/components/postTabPanel'
 import ButtonAppBar from '@/components/examples/app_bar'
 import ElevateAppBar from '@/components/examples/elevateAppbar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
+import useSWR from "swr";
+import axios from 'axios';
+import {backend} from '@/query.config';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function HomePage() {
-  const [ isLoggedIn, setIsLoggedIn ] = useState(true)
+  const [ isLoggedIn, setIsLoggedIn ] = useState(false)
   const [ username, setUsername ] = useState("abhinav")
   const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
   const [ userId, setUserId ] = useState("7498")
+
+  useEffect(() => {
+    const setter = async () => {
+      console.log("here")
+      const data = (await axios.get(`${backend}/login`)).data;
+      console.log(data)
+      if (data.status == 'Error'){
+        setIsLoggedIn(data.isLoggedIn);
+        setUsername(data.username);
+        setUserDisplayName(data.displayName);
+        setUserId(data.userId);
+      }
+    }
+
+    setter();
+  }, []);
+
+    useSWR(`${backend}/login`, )
 
   return (
     <>
