@@ -16,10 +16,14 @@ import { back_ip, back_port } from '@/utils/settings';
 import { useState } from 'react'
 import style from '@/styles/signup.module.css'
 import { Password } from '@mui/icons-material';
+import { backend } from '@/query.config';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const theme = createTheme();
 
 export default function SignUp() {
+    const router = useRouter();
     const [ passwordMatch, setPasswordMatch ] = useState(true);
 
     const [firstName, setFirstName] = useState("")
@@ -32,12 +36,28 @@ export default function SignUp() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        await axios.post(`http://${back_ip}:${back_port}/signup`, {
-            firstName,
-            lastName,
-            username,
-            password
-        })
+        const res = await axios.get(`${backend}/isNameAvailable/${username}`);
+
+        if(res.data.status === 'OK') {
+            setUsernameAvailable(true);
+        } else {
+            setUsernameAvailable(false);
+        }
+
+        if(usernameAvailable) {
+            const createUser = await axios.post(`${backend}/signup`, {
+                firstName: firstName,
+                lastName: lastName,
+                username: username,
+                password: password
+            });
+
+            if(createUser.data.status === 'OK') {
+                await router.push('/');
+            }
+        } else {
+            // Abhinav dekh le
+        }
     };
 
     return (

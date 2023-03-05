@@ -22,10 +22,8 @@ export default function HomePage() {
 
   useEffect(() => {
     const setter = async () => {
-      console.log("here")
       const data = (await axios.get(`${backend}/login`)).data;
-      console.log(data)
-      if (data.status == 'Error'){
+      if (data.status === 'Error'){
         setIsLoggedIn(data.isLoggedIn);
         setUsername(data.username);
         setUserDisplayName(data.displayName);

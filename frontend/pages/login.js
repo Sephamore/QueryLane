@@ -33,9 +33,10 @@ export default function Login() {
       username: username,
       password: password
     });
-    console.log(res.data)
+    const res2 = (await axios.get(`${backend}/login`)).data;
+    setUserDisplayName(res2.userDisplayName);
     if (res.data.status == 'OK') {
-      // router.push("/")
+      await router.push("/")
     }
   };
 

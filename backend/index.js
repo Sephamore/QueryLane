@@ -15,75 +15,22 @@ try {
 } catch (error) {
    console.error('Connection error:', error);
 }
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
+app.use(cors({
+   origin: ["http://127.0.0.1:3000", "http://20.193.230.163:3000"],
+   credentials: true,
+}));
 app.use(sessions({
    secret: process.env.SECRET,
    saveUninitialized: true,
    cookie: {
-      maxAge: 24*60*60*1000
+      maxAge: 24*60*60*100000,
+      secure: false
    },
    resave: false
 }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-/*
-var session = null;
-
-app.get('/',async (req, res) => {
-   if(session?.userId) {
-      // res.sendFile();  -> send the home page
-   } else {
-      // res.redirect('/login');  -> redirect to the login page
-   }
-});
-
-app.route('/login')
-    .get((req, res) => {
-       // res.sendFile();  -> send the login page
-      console.log(req.session.user)
-    })
-    .post(async (req, res) => {
-       const userId = req.body.userId;
-       try {
-          const loginInstance = await UsersModel.findOne({where: {username: userId}});
-          if(loginInstance) {
-             if(loginInstance.passwd === req.body.password) {
-                session = req.session;
-                session.userId = userId;
-
-                // res.sendFile();  -> send the home page
-             } else {
-                res.json({message: 'Incorrect password'});
-             }
-          } else {
-             res.json({message: 'User does not exist'});
-          }
-       } catch(error) {
-          console.log("Error occured: " + error.message);
-       }
-    });
-
-app.route('/register')
-    .get((req, res) => {
-       // res.sendFile();  -> send the register page
-    })
-    .post(async (req, res) => {
-       try {
-          const newUser = await UsersModel.create();  // user attributes incomplete
-
-          res.redirect('/login');
-       } catch(error) {
-           console.log('Error: ' + error.message);
-      }
-    });
-
-app.get('/logout', (req, res) => {
-   req.session.destroy();
-   session = null;
-
-   res.redirect('/');
-})
-*/
 app.use('/', userRoutes);
 app.listen(process.env.PORT, () => console.log('Server running at port %',process.env.PORT));

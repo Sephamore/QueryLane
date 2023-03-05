@@ -1,7 +1,7 @@
 import Post from "@/components/post"
 import { Box } from "@mui/system"
 import Paper from "@mui/material/Paper"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import TopBar from "@/components/topBar"
 import style from "@/styles/post.module.css"
 import InputLabel from '@mui/material/InputLabel';
@@ -148,6 +148,20 @@ export default function Posts() {
     const [sortBy, setSortBy] = useState("Score")
     const [ question, setQuestion ] = useState({})
     const [ answers, setAnswers ] = useState([])
+
+    useEffect(() => {
+        const setter = async () => {
+            const data = (await axios.get(`${backend}/login`)).data;
+            if (data.status === 'Error'){
+                setIsLoggedIn(data.isLoggedIn);
+                setUsername(data.username);
+                setUserDisplayName(data.displayName);
+                setUserId(data.userId);
+            }
+        }
+
+        setter();
+    }, []);
 
     const getQuestion = async (id) => {
         const res = await axios.get(`${backend}/posts/getdata/${id}`)

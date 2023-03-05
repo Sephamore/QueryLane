@@ -20,6 +20,7 @@ export const getComments = async (req, res) => {
 export const createComment = async (req, res) => {
     try {
         req.body.creation_date = new Date();
+        req.body.id = await CommentsModel.max("id") + 1;
         await CommentsModel.create( req.body );
         res.json({
             message: "Comment Created"

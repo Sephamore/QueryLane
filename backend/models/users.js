@@ -67,15 +67,16 @@ export default class users extends Model {
       allowNull: false
     },
     salt: {
-      type: DataTypes.CHAR(20),
+      type: DataTypes.STRING(50),
       allowNull: false
     },
     passwd: {
-      type: DataTypes.CHAR(64),
+      type: DataTypes.STRING(255),
       allowNull: false
     }
   }, {
     sequelize,
+    initialAutoIncrement: 424000,
     tableName: 'users',
     schema: 'public',
     timestamps: false,
