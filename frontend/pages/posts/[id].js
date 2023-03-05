@@ -66,8 +66,11 @@ export default function Posts() {
     const [ question, setQuestion ] = useState({})
     const [ answers, setAnswers ] = useState([])
     const [ dialogOpen, setDialogOpen] = useState(false)
-    const [post, setPost ] = useState("")
+    const [ post, setPost ] = useState("")
     const [ parentId, setParentId ] = useState(0)
+    const [ refresh, setRefresh ] = useState(false)
+    const [ editingId, setEditingId ] = useState(0)
+    const [ action, setAction ] = useState("")
 
     useEffect(() => {
         const setter = async () => {
@@ -105,14 +108,10 @@ export default function Posts() {
             const ans_ids = res3.data
             const id_str = ans_ids.join("&")
     
-            // console.log(id_str)
-    
-            // console.log("a")
-            // console.log(`${backend}/posts/getdata/${id_str}`)
             const res4 = await axios.get(`${backend}/posts/getdata/${id_str}`)
-            // console.log("b")
+
             const answers = res4.data;
-            // console.log(answers)
+
             const answerPosts = await Promise.all(answers.map(async (answer) => {
                 const res2 = await axios.get(`${backend}/comments/bypost/${answer.id}`)
                 const comments = await res2.data;
@@ -134,10 +133,32 @@ export default function Posts() {
     const answerPost = async (id) => {
         setDialogOpen(true)
         setParentId(id)
+        setAction("answer")
     }
 
-    const submit = async (id) => {
-        console.log("submit")
+    const editPost = async (id, data) => {
+        // console.log(data)
+        setDialogOpen(true)
+        setEditingId(id)
+        setAction("edit")
+    }
+
+    const submitEdit = async () => {
+        const data = {
+            owner_user_id: userId,
+            owner_display_name: userDisplayName || null,
+            tags: "",
+            body: post,
+            parent_id: parentId
+        }
+        console.log(data)
+        const res = await axios.post(`${backend}/posts/create`, data)
+        console.log("create ", res.data)
+        setDialogOpen(false)
+        setRefresh(!refresh)
+    }
+
+    const submitReply = async () => {
         const data = {
             owner_user_id: userId,
             post_type_id: "2",
@@ -149,17 +170,37 @@ export default function Posts() {
         console.log(data)
         const res = await axios.post(`${backend}/posts/create`, data)
         console.log("create ", res.data)
+        setDialogOpen(false)
+        setRefresh(!refresh)
+    }
 
-        if (res.data.status == "OK") {
-            router.push(`/posts/${res.data.id}`)
+    const submit = async () => {
+        const data = {
+            owner_user_id: userId,
+            owner_display_name: userDisplayName || null,
+            tags: "",
+            body: post,
         }
+        if (action == "answer"){
+            data.post_type_id = '2';
+            data.parent_id = parentId
+            const res = await axios.post(`${backend}/posts/create`, data)
+            console.log("create ", res.data)
+        }
+        if (action == "edit") {
+            data.id = editingId;
+            const res = await axios.patch(`${backend}/posts/update`, data)
+            console.log("update ", res.data)
+        }
+        setDialogOpen(false)
+        setRefresh(!refresh)
     }
 
     useEffect(() => {
         try{
             getQuestion(id)
         } catch (e) {}
-    }, [id, sortBy])
+    }, [id, sortBy, refresh])
 
     // rte
     // const [dialogOpen, setDialogOpen] = useState(false);
@@ -168,7 +209,7 @@ export default function Posts() {
         <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} setIsLoggedIn={setIsLoggedIn} />
         <Box display="flex" justifyContent="center" flexDirection="column" >
             <Box>
-                <FlexiblePost displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} onAnswer={answerPost} />
+                <FlexiblePost displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} onAnswer={answerPost} onEdit={editPost} />
             </Box>
             <Box display="flex" flexDirection="column" alignItems="center">
                 <Paper
@@ -200,13 +241,12 @@ export default function Posts() {
                         {/* <Box flexGrow={1} /> */}
                     </Box>
                 </Paper>
-                
             </Box>
             <Box>
                 {
                     answers.map(({post, comments}) => (
                         <Box  key={post.id}>
-                            <FlexiblePost key={post.id} post={post} comments={comments} accepted_answer_id={question.post.accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} />
+                            <FlexiblePost key={post.id} post={post} comments={comments} accepted_answer_id={question.post.accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onEdit={editPost} />
                         </Box>
                     ))
                 }
@@ -214,10 +254,9 @@ export default function Posts() {
         </Box>
         <RichTextDialog open={dialogOpen} onSubmit={submit} onCancel={() => {
             setDialogOpen(false);
-        }} 
+        }}
         onChange={(value) => {
             setPost(value);
-            // console.log(value)
         }}
         />
 

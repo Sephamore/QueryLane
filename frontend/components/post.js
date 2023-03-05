@@ -59,7 +59,7 @@ export function Comments({ comments }) {
 }
 
 
-export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer }) {
+export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, onEdit }) {
     const upvote = () => {
 
     }
@@ -203,7 +203,9 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer }) 
                     {isLoggedIn && (
                         userId == post.owner_user_id &&
                         <Tooltip title="edit">
-                            <IconButton onClick={comment}>
+                            <IconButton onClick={() => {
+                                onEdit(post.id, post.body)
+                            }}>
                                 {/* <Box component="img" src="/icons/edit.svg" alt="edit" height={20}/> */}
                                 <Edit className={style.edit_icon} />
                             </IconButton>
@@ -216,11 +218,11 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer }) 
 }
 
 
-export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId, onAnswer}) {
+export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId, onAnswer, onEdit}) {
     return (
         <Box>
             <Box sx={{p: 1}} className={style.white_bg} >
-                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onAnswer={onAnswer}/>
+                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onAnswer={onAnswer} onEdit={onEdit} />
             </Box>
             <Divider component="div" sx={{ borderTopWidth: 1, borderColor: "ActiveBorder" }} />
             <Box display="flex" flexDirection="row">
