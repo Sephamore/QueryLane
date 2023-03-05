@@ -19,6 +19,8 @@ import {useRouter} from 'next/router'
 
 const theme = createTheme();
 
+axios.defaults.withCredentials = true
+
 export default function Login() {
   const router = useRouter()
 
@@ -35,6 +37,9 @@ export default function Login() {
     });
     const res2 = (await axios.get(`${backend}/login`)).data;
     setUserDisplayName(res2.userDisplayName);
+    console.log(res.data)
+    const res2 = await axios.get(`${backend}/login`)
+    console.log(res2.data)
     if (res.data.status == 'OK') {
       await router.push("/")
     }

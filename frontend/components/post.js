@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Paper from '@mui/material/Paper'
 import { useRouter } from "next/router";
-import { ThumbUp, ThumbDown, Visibility, ContentCopy, Reply, Edit, CheckCircle, HorizontalRule, Minimize } from "@mui/icons-material";
+import { ThumbUp, ThumbDown, Visibility, ContentCopy, Reply, Edit, CheckCircle, HorizontalRule, Minimize, ReplyAll } from "@mui/icons-material";
 import { useState } from "react";
 
 
@@ -59,7 +59,7 @@ export function Comments({ comments }) {
 }
 
 
-export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
+export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer }) {
     const upvote = () => {
 
     }
@@ -188,6 +188,17 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
                             <Reply className={style.action_icon} />
                         </IconButton>
                     </Tooltip>
+                    {
+                        isLoggedIn &&
+                        <Tooltip title="answer">
+                            <IconButton onClick={() => {
+                                onAnswer(post.id)
+                            }}>
+                                {/* <Box component="img" src="/icons/reply.svg" alt="comment" height={20}/> */}
+                                <ReplyAll className={style.action_icon} />
+                            </IconButton>
+                        </Tooltip>
+                    }
 
                     {isLoggedIn && (
                         userId == post.owner_user_id &&
@@ -205,11 +216,11 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId}) {
 }
 
 
-export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId}) {
+export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId, onAnswer}) {
     return (
         <Box>
             <Box sx={{p: 1}} className={style.white_bg} >
-                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId}/>
+                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onAnswer={onAnswer}/>
             </Box>
             <Divider component="div" sx={{ borderTopWidth: 1, borderColor: "ActiveBorder" }} />
             <Box display="flex" flexDirection="row">

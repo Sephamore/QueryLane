@@ -6,10 +6,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import MUIRichTextEditor from "mui-rte";
+import ReactRTE from './reactRTE';
 
-
-export default function RichTextDialog({ setResult, ...props }) {
+export default function RichTextDialog({ setResult, onChange, onSubmit, onCancel, ...props }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -22,36 +21,18 @@ export default function RichTextDialog({ setResult, ...props }) {
 
   return (
     <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open form dialog
-      </Button>
       <Dialog {...props}>
-        <DialogTitle >Subscribe</DialogTitle>
+        <DialogTitle >Write below</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here. We
-            will send updates occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-          <MUIRichTextEditor 
-            onChange={(data) => {
-              console.log(data)
-              console.log(data.value)
-            }}
-            label="Type here…"
+          <ReactRTE
+            onChange={onChange}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Subscribe</Button>
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button onClick={(e) => {
+            onSubmit(e);
+          }}>Done</Button>
         </DialogActions>
       </Dialog>
     </div>

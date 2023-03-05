@@ -20,6 +20,7 @@ import { backend } from '@/query.config';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true
 const theme = createTheme();
 
 export default function SignUp() {
