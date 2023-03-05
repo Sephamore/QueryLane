@@ -102,8 +102,7 @@ export function PostPreview({ post }) {
     )
 }
 
-export default function PostPriviewList({ posts }) {
-    
+export default function PostPreviewList({ posts }) {
     return (
         <Grid
             container
@@ -115,13 +114,17 @@ export default function PostPriviewList({ posts }) {
             <Grid item xs={3}>
                 <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                     {
-                        (posts != [] &&
+                        ((
+                            posts.length == 0 && 
+                            <Box fontSize={20}>
+                                No posts
+                            </Box>
+                        ) ||
                         posts.map( post => (
                             <div key={post.id}>
                                     <PostPreview post={post} />
                             </div>
-                        ))) ||
-                        "loading"
+                        )))
                     }
                 </List>
             </Grid>

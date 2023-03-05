@@ -5,7 +5,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Grid } from '@mui/material';
-import PostPriviewList from './postPreview';
+import PostPreviewList from './postPreview';
 import List from '@mui/material/List';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -26,12 +26,10 @@ async function getDataByID(id){
 
   ids = id.join("&")
 
-  console.log(`${url}/posts/getdata/${ids}`)
   const response = await axios.get(`${url}/posts/getdata/${ids}`)
 
   const a = response.data
 
-  console.log(a)
   
   return a;
   
@@ -100,15 +98,17 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
     const res = await fetch(src)
 
     const requestedIDs = await res.json()
-
     const ids = Object.values(requestedIDs).join("&")
 
-    const response = await axios.get(`${url}/posts/getsummary/${ids}`)
+    try {
+      if (ids == '')
+        return
+      const response = await axios.get(`${url}/posts/getsummary/${ids}`)
+      const data = response.data;
+      setter(data);
+    } catch (e) {
+    }
 
-    const data = response.data;
-    setter(data);
-
-    return response.data;
   }
   // const fetcher = async (src, ) => {
   //   const res = await fetch(src)
@@ -156,7 +156,6 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
   useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/1`,(src) => {
     if (isLoggedIn){
       fetcher(src, (posts) => {
-        console.log(posts)
         posts.reverse();
         setAskByYou(posts);
       })
@@ -168,7 +167,7 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
       fetcher(src, (posts) => {
         posts.reverse();
         setAnsweredByYou(posts);
-    })
+      })
     }
 
   });
@@ -213,16 +212,16 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
         </Grid>
       </Grid>
       <TabPanel value={value} index={0}>
-        <PostPriviewList posts={trendingPosts} />
+        <PostPreviewList posts={trendingPosts} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <PostPriviewList posts={recentPosts} />
+        <PostPreviewList posts={recentPosts} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <PostPriviewList posts={askedByYou} />
+        <PostPreviewList posts={askedByYou} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <PostPriviewList posts={answeredByYou} />
+        <PostPreviewList posts={answeredByYou} />
       </TabPanel>
     </Box>
   );

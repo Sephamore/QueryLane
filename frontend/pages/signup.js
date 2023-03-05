@@ -17,6 +17,7 @@ import { useState } from 'react'
 import style from '@/styles/signup.module.css'
 import { Password } from '@mui/icons-material';
 
+axios.defaults.withCredentials = true
 const theme = createTheme();
 
 export default function SignUp() {

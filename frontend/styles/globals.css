@@ -109,3 +109,8 @@ a {
 .background_dbg {
   background-color: #b1000033;
 }
+
+.white_transparent {
+  background-color: white;
+  opacity: 0.15;
+}

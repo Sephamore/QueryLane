@@ -1,7 +1,7 @@
 import Post from "@/components/post"
 import { Box } from "@mui/system"
 import Paper from "@mui/material/Paper"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import TopBar from "@/components/topBar"
 import style from "@/styles/post.module.css"
 import InputLabel from '@mui/material/InputLabel';
@@ -12,6 +12,7 @@ import { useRouter } from "next/router"
 import useSwr from 'swr'
 import { backend } from "@/query.config"
 import axios from "axios"
+import { Typography } from "@mui/material"
 // import RichTextDialog from "@/components/richTextDialog"
 
 
@@ -29,11 +30,12 @@ function FlexiblePost(props) {
             {
                 props.displayTitle && 
                 <Paper
-                    className={style.title}
-                    sx={{minWidth: {xs: "95%", sm: "85%", md: "75%", lg: "65%", xl: "55%" }, p: 1, m:1}}
+                    sx={{width: {xs: "95%", sm: "85%", md: "75%", lg: "65%", xl: "55%" }, p: 1, m:1}}
                     elevation={10}
                 >
-                    {props.post.title}
+                    <Typography sx={{ wordBreak: "break-word" }} className={style.title} > 
+                        {props.post.title}
+                    </Typography>
                 </Paper>
             }
             <Paper
@@ -52,118 +54,33 @@ function FlexiblePost(props) {
 export default function Posts() {
     const router = useRouter();
     const {id} = router.query
-    const post = {
-        body: "Text ".repeat(400),
-        tags: "<text><python><js>",
-        id: "456789",
-        owner_user_id: "564",
-        last_editor_user_id: "5467",
-        post_type_id: "1",
-        accepted_answer_id: "5667",
-        score: "456",
-        parent_id: "67645",
-        view_count: "324",
-        answer_count: "12",
-        comment_count: "4",
-        owner_display_name: "Abhinav",
-        last_editor_display_name: "Yadav",
-        title: "A simple text 400 times",
-        content_license: "4565u7",
-        favorite_count: "12",
-        creation_date: "2022-12-12T19:36:50.053Z",
-        community_owned_date: "2022-12-12",
-        closed_date: "2023-02-02",
-        last_edit_date: "2023-02-01T23:54:40.053Z",
-        last_activity_date: "2023-02-03",
-        owner_profile_image_url: "/vercel.svg",
-        last_editor_profile_image_url: "/vercel.svg"
-    }
-    const post2 = {
-        body: "Text ".repeat(400),
-        tags: "<text><python><js>",
-        id: "4565",
-        owner_user_id: "564",
-        last_editor_user_id: "5467",
-        post_type_id: "1",
-        accepted_answer_id: "5667",
-        score: "456",
-        parent_id: "67645",
-        view_count: "324",
-        answer_count: "12",
-        comment_count: "4",
-        owner_display_name: "Abhinav",
-        last_editor_display_name: "Yadav",
-        title: "A simple text 400 times",
-        content_license: "4565u7",
-        favorite_count: "12",
-        creation_date: "2022-12-12 19:36:50.053",
-        community_owned_date: "2022-12-12",
-        closed_date: "2023-02-02",
-        last_edit_date: "2023-02-01 23:54:40.053",
-        last_activity_date: "2023-02-03",
-        owner_profile_image_url: "/vercel.svg",
-        last_editor_profile_image_url: "/vercel.svg"
-    }
-
-    const comments = [
-        {
-            id: "54534",
-            post_id: "456789",
-            user_id: "534",
-            score: "23",
-            content_license: "qrw4f4",
-            user_display_name: "Someone",
-            text: "Why so many texts bro?",
-            creation_date: "2023-02-12 16:21:05.756",
-        },
-        {
-            id: "545",
-            post_id: "456789",
-            user_id: "5934",
-            score: "4",
-            content_license: "5657hg",
-            user_display_name: "No one",
-            text: "Hehe! Texts!! ".repeat(100),
-            creation_date: "2023-02-25 14:43:56.656",
-        },
-        {
-            id: "435",
-            post_id: "456789",
-            user_id: "56463",
-            score: "5",
-            content_license: "rgtwt4",
-            user_display_name: "Random one",
-            text: "F U. ".repeat(40),
-            creation_date: "2023-02-25 14:59:59.999",
-        },
-    ]
-
-    const theQuestion = {post, comments}
-    const theAnswers=[{post, comments}, {post: post2, comments}]
 
     const [ isLoggedIn, setIsLoggedIn ] = useState(true)
     const [ username, setUsername ] = useState("abhinav")
     const [ userId, setUserId ] = useState("7498")
     const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
-    const [sortBy, setSortBy] = useState("Score")
+    const [ sortBy, setSortBy ] = useState("Score")
     const [ question, setQuestion ] = useState({})
     const [ answers, setAnswers ] = useState([])
 
     const getQuestion = async (id) => {
+        if (!id)
+            return
         const res = await axios.get(`${backend}/posts/getdata/${id}`)
         const data = res.data
         const res2 = await axios.get(`${backend}/comments/bypost/${id}`)
         const comments = res2.data;
+        console.log(data[0])
         setQuestion({post: data[0], comments});
 
         const res3 = await axios.get(`${backend}/posts/getanswers/${id}`)
         const ans_ids = res3.data
         const id_str = ans_ids.join("&")
 
-        console.log(id_str)
+        // console.log(id_str)
 
         // console.log("a")
-        console.log(`${backend}/posts/getdata/${id_str}`)
+        // console.log(`${backend}/posts/getdata/${id_str}`)
         const res4 = await axios.get(`${backend}/posts/getdata/${id_str}`)
         // console.log("b")
         const answers = res4.data;
@@ -174,10 +91,20 @@ export default function Posts() {
             return {post: answer, comments}
         }))
         console.log(answerPosts)
-        setAnswers(answerPosts)
+        if (sortBy == "score")
+            setAnswers(answerPosts.sort((p1, p2) => {
+                p1.score < p2.score
+            }))
+        else {
+            setAnswers(answerPosts.reverse())
+        }
     }
 
-    useSwr(id, getQuestion)
+    useEffect(() => {
+        try{
+            getQuestion(id)
+        } catch (e) {}
+    }, [id, sortBy])
 
     // rte
     // const [dialogOpen, setDialogOpen] = useState(false);
@@ -211,8 +138,8 @@ export default function Posts() {
                                 }}
                             >
                                 <MenuItem value={"Score"}>Score</MenuItem>
-                                <MenuItem value={"TimeAsc"}>Time (oldest first)</MenuItem>
-                                <MenuItem value={"TimeDesc"}>Time (newest first)</MenuItem>
+                                <MenuItem value={"Time"}>Time</MenuItem>
+                                {/* <MenuItem value={"TimeDesc"}>Time (newest first)</MenuItem> */}
                             </Select>
                         </FormControl>
                         {/* <Box flexGrow={1} /> */}
@@ -224,7 +151,7 @@ export default function Posts() {
                 {
                     answers.map(({post, comments}) => (
                         <Box  key={post.id}>
-                            <FlexiblePost key={post.id} post={post} comments={comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} />
+                            <FlexiblePost key={post.id} post={post} comments={comments} accepted_answer_id={question.post.accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} />
                         </Box>
                     ))
                 }
