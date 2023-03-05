@@ -4,7 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import PostPreviewList from './postPreview';
 import List from '@mui/material/List';
 import { useState } from 'react';
@@ -218,6 +218,9 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
         <PostPreviewList posts={recentPosts} />
       </TabPanel>
       <TabPanel value={value} index={2}>
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Button href='/create_post' > Ask </Button>
+        </Box>
         <PostPreviewList posts={askedByYou} />
       </TabPanel>
       <TabPanel value={value} index={3}>

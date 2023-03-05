@@ -13,7 +13,10 @@ import useSwr from 'swr'
 import { backend } from "@/query.config"
 import axios from "axios"
 import { Typography } from "@mui/material"
-// import RichTextDialog from "@/components/richTextDialog"
+import RichTextDialog from "@/components/richTextDialog"
+
+
+axios.defaults.withCredentials = true
 
 
 function FlexiblePost(props) {
@@ -62,41 +65,93 @@ export default function Posts() {
     const [ sortBy, setSortBy ] = useState("Score")
     const [ question, setQuestion ] = useState({})
     const [ answers, setAnswers ] = useState([])
+    const [ dialogOpen, setDialogOpen] = useState(false)
+    const [post, setPost ] = useState("")
+    const [ parentId, setParentId ] = useState(0)
+
+    useEffect(() => {
+        const setter = async () => {
+          try {
+            const data = (await axios.get(`${backend}/login`)).data;
+            console.log(data);
+            if (data.status == 'OK'){
+              setIsLoggedIn(data.isLoggedIn);
+              setUsername(data.username);
+              setUserDisplayName(data.displayName);
+              setUserId(data.userId);
+            } else {
+              setIsLoggedIn(false);
+            }
+          } catch (e) {
+    
+          }
+        }
+    
+        setter();
+    });
 
     const getQuestion = async (id) => {
         if (!id)
-            return
-        const res = await axios.get(`${backend}/posts/getdata/${id}`)
-        const data = res.data
-        const res2 = await axios.get(`${backend}/comments/bypost/${id}`)
-        const comments = res2.data;
-        console.log(data[0])
-        setQuestion({post: data[0], comments});
-
-        const res3 = await axios.get(`${backend}/posts/getanswers/${id}`)
-        const ans_ids = res3.data
-        const id_str = ans_ids.join("&")
-
-        // console.log(id_str)
-
-        // console.log("a")
-        // console.log(`${backend}/posts/getdata/${id_str}`)
-        const res4 = await axios.get(`${backend}/posts/getdata/${id_str}`)
-        // console.log("b")
-        const answers = res4.data;
-        // console.log(answers)
-        const answerPosts = await Promise.all(answers.map(async (answer) => {
-            const res2 = await axios.get(`${backend}/comments/bypost/${answer.id}`)
-            const comments = await res2.data;
-            return {post: answer, comments}
-        }))
-        console.log(answerPosts)
-        if (sortBy == "score")
-            setAnswers(answerPosts.sort((p1, p2) => {
-                p1.score < p2.score
+            return;
+        try {
+            const res = await axios.get(`${backend}/posts/getdata/${id}`)
+            const data = res.data
+            const res2 = await axios.get(`${backend}/comments/bypost/${id}`)
+            const comments = res2.data;
+            console.log(data[0])
+            setQuestion({post: data[0], comments});
+    
+            const res3 = await axios.get(`${backend}/posts/getanswers/${id}`)
+            const ans_ids = res3.data
+            const id_str = ans_ids.join("&")
+    
+            // console.log(id_str)
+    
+            // console.log("a")
+            // console.log(`${backend}/posts/getdata/${id_str}`)
+            const res4 = await axios.get(`${backend}/posts/getdata/${id_str}`)
+            // console.log("b")
+            const answers = res4.data;
+            // console.log(answers)
+            const answerPosts = await Promise.all(answers.map(async (answer) => {
+                const res2 = await axios.get(`${backend}/comments/bypost/${answer.id}`)
+                const comments = await res2.data;
+                return {post: answer, comments}
             }))
-        else {
-            setAnswers(answerPosts.reverse())
+            console.log(answerPosts)
+            if (sortBy == "score")
+                setAnswers(answerPosts.sort((p1, p2) => {
+                    p1.score < p2.score
+                }))
+            else {
+                setAnswers(answerPosts.reverse())
+            }
+        } catch (e) {
+
+        }
+    }
+
+    const answerPost = async (id) => {
+        setDialogOpen(true)
+        setParentId(id)
+    }
+
+    const submit = async (id) => {
+        console.log("submit")
+        const data = {
+            owner_user_id: userId,
+            post_type_id: "2",
+            owner_display_name: userDisplayName || null,
+            tags: "",
+            body: post,
+            parent_id: parentId
+        }
+        console.log(data)
+        const res = await axios.post(`${backend}/posts/create`, data)
+        console.log("create ", res.data)
+
+        if (res.data.status == "OK") {
+            router.push(`/posts/${res.data.id}`)
         }
     }
 
@@ -110,10 +165,10 @@ export default function Posts() {
     // const [dialogOpen, setDialogOpen] = useState(false);
 
     return (<>
-        <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} />
+        <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} setIsLoggedIn={setIsLoggedIn} />
         <Box display="flex" justifyContent="center" flexDirection="column" >
             <Box>
-                <FlexiblePost displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} />
+                <FlexiblePost displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} onAnswer={answerPost} />
             </Box>
             <Box display="flex" flexDirection="column" alignItems="center">
                 <Paper
@@ -157,7 +212,15 @@ export default function Posts() {
                 }
             </Box>
         </Box>
-        {/* <RichTextDialog open={dialogOpen} /> */}
+        <RichTextDialog open={dialogOpen} onSubmit={submit} onCancel={() => {
+            setDialogOpen(false);
+        }} 
+        onChange={(value) => {
+            setPost(value);
+            // console.log(value)
+        }}
+        />
+
     </>
     )
 }

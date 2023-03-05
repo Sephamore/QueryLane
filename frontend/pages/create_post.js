@@ -50,8 +50,12 @@ export default function CreatePost() {
             body: post
         }
         console.log(data)
-        const res = await axios.post("posts/create", data)
+        const res = await axios.post(`${backend}/posts/create`, data)
         console.log("create ", res.data)
+
+        if (res.data.status == "OK") {
+            router.push(`/posts/${res.data.id}`)
+        }
     }
 
     return (
