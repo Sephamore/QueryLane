@@ -4,7 +4,6 @@ import { Op } from "sequelize";
 //returns vote entries based on the params- userid and postid (can be "all") 
 export const getVotesByUser = async (req, res) => {
     try {
-
         let searchCriteria = {
             user_id: req.params.userid,
             post_id: req.params.postid            

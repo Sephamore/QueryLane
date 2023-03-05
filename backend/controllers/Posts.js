@@ -94,10 +94,10 @@ export const updatePost = async (req, res) => {
         };
 
         let newData = req.body;
-        newData.keys(values).forEach( (key) => {
-          if (values[key] === undefined) {delete values[key];}        // handle undefined
-          if (values[key] === null){values[key] === "";}              // use empty string instead of nulls
-        }); 
+        // newData.keys(values).forEach( (key) => {
+        //   if (values[key] === undefined) {delete values[key];}        // handle undefined
+        //   if (values[key] === null){values[key] === "";}              // use empty string instead of nulls
+        // }); 
 
         const now = new Date();
         await PostsModel.update({

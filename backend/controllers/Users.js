@@ -131,7 +131,11 @@ export const getSimilarNames = async (req, res) => {
       //substring at start
       var results = await UsersModel.findAll({
           where: {
-              display_name : {[Op.iLike]: searchPrefix }
+              [Op.or] : [{
+                display_name : {[Op.iLike]: searchPrefix }
+              },
+            
+            ]
           }, 
           attributes: ["id", "display_name", "username"],
           order: [['display_name', 'ASC']],
