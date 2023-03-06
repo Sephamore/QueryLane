@@ -31,14 +31,28 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const res = await axios.post(`${backend}/login`, {
-      username: username,
-      password: password
-    });
-    if (res.data.status == 'OK') {
-      await router.push("/")
+    try {
+      const res = await axios.post(`${backend}/login`, {
+        username: username,
+        password: password
+      });
+      console.log(res.data)
+      if (res.data.status == 'OK') {
+        // await router.push("/")
+      }
+    } catch (e) {
+
     }
   };
+
+  const checkLogin = async () => {
+    try {
+      const res = await axios.get(`${backend}/login`)
+      console.log(res.data)
+    } catch (e) {
+
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -107,6 +121,14 @@ export default function Login() {
             >
               Log In
             </Button>
+            {/* <Button
+              fullWidth
+              variant='outlined'
+              // sx={{ mt: 3, mb: 2 }}
+              onClick={checkLogin}
+            >
+              Check Login
+            </Button> */}
             <Grid container>
               {/* <Grid item xs>
                 <Link href="#" variant="body2">

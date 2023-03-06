@@ -96,19 +96,23 @@ export default function TopBar({ showSearchBar, isLoggedIn, username, userDispla
 
   useEffect(() => {
     const getTags = async () => {
-      if (!showSearchBar)
-        return
-      const res = await axios.get(`${backend}/tags/get`)
-      const data = res.data.map((tag) => {
-        return {
-          name: tag.tag_name,
-          id: tag.id.toString(),
-          type: "tag"
-        }
-      })
-      setAllTags(data);
-      setOptions(users.concat(allTags))
-      console.log("ops", options)
+      try {
+        if (!showSearchBar)
+          return
+        const res = await axios.get(`${backend}/tags/get`)
+        const data = res.data.map((tag) => {
+          return {
+            name: tag.tag_name,
+            id: tag.id.toString(),
+            type: "tag"
+          }
+        })
+        setAllTags(data);
+        setOptions(users.concat(allTags))
+        console.log("ops", options)
+      } catch (e) {
+
+      }
     }
 
     getTags();
@@ -191,8 +195,12 @@ export default function TopBar({ showSearchBar, isLoggedIn, username, userDispla
   };
 
   const logout = async () => {
-    await axios.get(`${backend}/logout`)
-    setIsLoggedIn(false)
+    try {
+      await axios.get(`${backend}/logout`)
+      setIsLoggedIn(false)
+    } catch (e) {
+      
+    }
   }
 
   const router = useRouter();

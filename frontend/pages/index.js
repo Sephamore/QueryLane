@@ -35,6 +35,7 @@ export default function HomePage() {
     const setter = async () => {
       try {
         const data = (await axios.get(`${backend}/login`)).data;
+        console.debug(data)
         if (data.status == 'OK'){
           setIsLoggedIn(data.isLoggedIn);
           setUsername(data.username);

@@ -10,6 +10,7 @@ import List from '@mui/material/List';
 import { useState } from 'react';
 import useSWR from 'swr';
 import axios from "axios"
+import { backend } from '@/query.config';
 
 
 const url = "http://20.193.230.163:5000"
@@ -95,12 +96,12 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
   // start here recent post
 
   const fetcher = async (src, setter) => {
-    const res = await fetch(src)
-
-    const requestedIDs = await res.json()
-    const ids = Object.values(requestedIDs).join("&")
-
     try {
+      const res = await fetch(src)
+
+      const requestedIDs = await res.json()
+      const ids = Object.values(requestedIDs).join("&")
+
       if (ids == '')
         return
       const response = await axios.get(`${url}/posts/getsummary/${ids}`)
@@ -146,25 +147,25 @@ export default function PostTabPanel({isLoggedIn, username, userId}) {
     })
   });
 
-  useSWR('http://20.193.230.163:5000/posts/trending',(src) => {
-    fetcher(src, (posts) => {
+  useSWR('http://20.193.230.163:5000/posts/trending',async (src) => {
+    await fetcher(src, (posts) => {
       posts.reverse();
       setTrendingPosts(posts);
     })
   });
 
-  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/1`,(src) => {
+  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/1`,async (src) => {
     if (isLoggedIn){
-      fetcher(src, (posts) => {
+      await fetcher(src, (posts) => {
         posts.reverse();
         setAskByYou(posts);
       })
     }
   });
 
-  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/2`,(src) => {
+  useSWR(`http://20.193.230.163:5000/posts/byuser/${userId}/upvotes/2`,async (src) => {
     if (isLoggedIn){
-      fetcher(src, (posts) => {
+      await fetcher(src, (posts) => {
         posts.reverse();
         setAnsweredByYou(posts);
       })
