@@ -15,7 +15,7 @@ export const isUserNameAvailable = async (req, res) => {
   const username = req.params.username;
 
   try {
-    const findUser = UsersModel.findOne({where: {username: username}});
+    const findUser = await UsersModel.findOne({where: {username: username}});
     if(findUser) {
       res.json({message: 'Username already exists', status: 'Error'});
     } else {

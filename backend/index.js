@@ -16,7 +16,12 @@ try {
    console.error('Connection error:', error);
 }
 app.use(cors({
-   origin: ["http://127.0.0.1:3000", "http://20.193.230.163:3000", "http://localhost:3000"],
+   origin: [
+      "http://127.0.0.1:3000",
+      "http://20.193.230.163:3000",
+      "http://localhost:3000",
+      "http://querylane.centralindia.cloudapp.azure.com:3000"
+   ],
    credentials: true,
 }));
 app.use(sessions({
