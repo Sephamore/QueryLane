@@ -59,6 +59,10 @@ export default function CreatePost() {
     }
 
     return (
+        <RTE />
+    )
+
+    return (
         <Box>
             <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} setIsLoggedIn={setIsLoggedIn} />
             <Box sx = {{ flexDirection: "column", display: "flex", alignItems: "center",}}>
@@ -76,7 +80,6 @@ export default function CreatePost() {
                     <RTE
                         onChange={(value) => {
                             setPost(value);
-                            console.log(value);
                         }}
                     />
                 </Box>

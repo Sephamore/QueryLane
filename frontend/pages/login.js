@@ -24,6 +24,8 @@ axios.defaults.withCredentials = true
 export default function Login() {
   const router = useRouter()
 
+  console.log(router)
+
   const [ username, setUsername ] = useState("User_6")
   const [ userDisplayName, setUserDisplayName ] = useState("Abhinav")
   const [ password, setPassword ] = useState('User_6')
@@ -36,12 +38,23 @@ export default function Login() {
         username: username,
         password: password
       });
-      console.log(res.data)
+      console.log(res)
+      await checkLogin()
       if (res.data.status == 'OK') {
-        // await router.push("/")
+        let redirect = "/"
+        if (router.asPath.split("?").length != 1){
+          const params = router.asPath.split("?")[1].split("&");
+          params.map((param) => {
+            const [key, value] = param.split("=");
+            if (key == "redirect"){
+              redirect = value;
+            }
+          })
+        }
+        router.push(redirect);
       }
     } catch (e) {
-
+      console.log(e)
     }
   };
 

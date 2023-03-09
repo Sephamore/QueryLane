@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 //import the component
 const RichTextEditor = dynamic(() => import("react-rte"), { ssr: false });
 
-const ReactRTE = ({ onChange }) => {
+const RTE = ({ onChange }) => {
   const [value, setValue] = useState();
 
   useEffect(() => {
@@ -28,6 +28,7 @@ const ReactRTE = ({ onChange }) => {
   return (
     <Box>
         <RichTextEditor value={value} onChange={handleOnChange} />
+        
     </Box>
   )
 };

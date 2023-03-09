@@ -239,7 +239,9 @@ export default function TopBar({ showSearchBar, isLoggedIn, username, userDispla
           </MenuItem>}
 
         {!isLoggedIn && <MenuItem onClick={() => {
-          router.push("/login");
+          const path = router.asPath;
+          
+          router.push(`/login?redirect=${path}`);
         }}>
           Login
         </MenuItem>}

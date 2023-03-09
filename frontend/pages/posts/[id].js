@@ -6,10 +6,9 @@ import TopBar from "@/components/topBar"
 import style from "@/styles/post.module.css"
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import { useRouter } from "next/router"
-import useSwr from 'swr'
 import { backend } from "@/query.config"
 import axios from "axios"
 import { Typography } from "@mui/material"
@@ -71,6 +70,7 @@ export default function Posts() {
     const [ refresh, setRefresh ] = useState(false)
     const [ editingId, setEditingId ] = useState(0)
     const [ action, setAction ] = useState("")
+    const [ rteDefaultValue, setRteDefaultValue ] = useState("<p><br></p>")
 
     useEffect(() => {
         const setter = async () => {
@@ -134,50 +134,21 @@ export default function Posts() {
         setDialogOpen(true)
         setParentId(id)
         setAction("answer")
+        setRteDefaultValue("")
     }
 
     const editPost = async (id, data) => {
         // console.log(data)
         setDialogOpen(true)
         setEditingId(id)
+        setRteDefaultValue(data)
         setAction("edit")
-    }
-
-    const submitEdit = async () => {
-        const data = {
-            owner_user_id: userId,
-            owner_display_name: userDisplayName || null,
-            tags: "",
-            body: post,
-            parent_id: parentId
-        }
-        console.log(data)
-        const res = await axios.post(`${backend}/posts/create`, data)
-        console.log("create ", res.data)
-        setDialogOpen(false)
-        setRefresh(!refresh)
-    }
-
-    const submitReply = async () => {
-        const data = {
-            owner_user_id: userId,
-            post_type_id: "2",
-            owner_display_name: userDisplayName || null,
-            tags: "",
-            body: post,
-            parent_id: parentId
-        }
-        console.log(data)
-        const res = await axios.post(`${backend}/posts/create`, data)
-        console.log("create ", res.data)
-        setDialogOpen(false)
-        setRefresh(!refresh)
     }
 
     const submit = async () => {
         const data = {
             owner_user_id: userId,
-            owner_display_name: userDisplayName || null,
+            owner_display_name: userDisplayName || "",
             tags: "",
             body: post,
         }
@@ -196,6 +167,26 @@ export default function Posts() {
         setRefresh(!refresh)
     }
 
+    const submitComment = async (value, post_id) => {
+        console.log(value, post_id)
+        const data = {
+            post_id,
+            user_id: userId,
+            user_display_name: userDisplayName || "",
+            text: value
+        }
+        const res = await axios.post(`${backend}/comments/create`, data)
+        setRefresh(!refresh)
+    }
+
+    const likePost = (post_id) => {
+        console.log("like")
+    }
+    
+    const dislikePost = (post_id) => {
+        console.log("dislike")
+    }
+
     useEffect(() => {
         try{
             getQuestion(id)
@@ -209,7 +200,7 @@ export default function Posts() {
         <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} setIsLoggedIn={setIsLoggedIn} />
         <Box display="flex" justifyContent="center" flexDirection="column" >
             <Box>
-                <FlexiblePost displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} onAnswer={answerPost} onEdit={editPost} />
+                <FlexiblePost likePost={likePost} dislikePost={dislikePost} submitComment={submitComment} displayTitle post={question.post} comments={question.comments} accepted_answer_id={456789} isLoggedIn={isLoggedIn} userId={userId} onAnswer={answerPost} onEdit={editPost} />
             </Box>
             <Box display="flex" flexDirection="column" alignItems="center">
                 <Paper
@@ -246,18 +237,22 @@ export default function Posts() {
                 {
                     answers.map(({post, comments}) => (
                         <Box  key={post.id}>
-                            <FlexiblePost key={post.id} post={post} comments={comments} accepted_answer_id={question.post.accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onEdit={editPost} />
+                            <FlexiblePost likePost={likePost} dislikePost={dislikePost} key={post.id} post={post} comments={comments} submitComment={submitComment} accepted_answer_id={question.post.accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onEdit={editPost} />
                         </Box>
                     ))
                 }
             </Box>
         </Box>
-        <RichTextDialog open={dialogOpen} onSubmit={submit} onCancel={() => {
-            setDialogOpen(false);
-        }}
-        onChange={(value) => {
-            setPost(value);
-        }}
+        <RichTextDialog
+            open={dialogOpen}
+            onSubmit={submit}
+            onCancel={() => {
+                setDialogOpen(false);
+            }}
+            onChange={(value) => {
+                setPost(value);
+            }}
+            defaultValue={rteDefaultValue}
         />
 
     </>

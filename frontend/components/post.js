@@ -11,6 +11,8 @@ import Paper from '@mui/material/Paper'
 import { useRouter } from "next/router";
 import { ThumbUp, ThumbDown, Visibility, ContentCopy, Reply, Edit, CheckCircle, HorizontalRule, Minimize, ReplyAll } from "@mui/icons-material";
 import { useState } from "react";
+import InfoSnackBar from "./infoSnackbar";
+import InputDialog from "./inputDialog";
 
 
 export function Comment({comment}) {
@@ -59,18 +61,10 @@ export function Comments({ comments }) {
 }
 
 
-export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, onEdit }) {
-    const upvote = () => {
-
-    }
-
-    const downvote = () => {
-
-    }
-
-    const comment = () => {
-
-    }
+export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, onEdit, submitComment, likePost, dislikePost }) {
+    const [ clipboardOpen, setClipboardOpen ] = useState(false)
+    const [ commentDialogOpen, setCommentDialogOpen ] = useState(false)
+    const [ comment, setComment ] = useState("")
 
     const router = useRouter();
 
@@ -130,7 +124,7 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, on
             <Box display="flex" flexDirection="row">
                 <Box display="flex" flexDirection="row" sx={{mr: 2}} >
                     <Tooltip title="downvote">
-                        <IconButton onClick={downvote}>
+                        <IconButton onClick={dislikePost}>
                             {/* <Box component="img" src="/icons/downvote.png" alt="downvote" height={20}/> */}
                             <ThumbDown className={style.thumb_down}/>
                         </IconButton>
@@ -141,7 +135,7 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, on
                         </div>
                     </Tooltip>
                     <Tooltip title="upvote">
-                        <IconButton onClick={upvote}>
+                        <IconButton onClick={likePost}>
                             {/* <Box component="img" src="/icons/upvote.png" alt="upvote" height={20}/> */}
                             <ThumbUp className={style.thumb_up} />
                         </IconButton>
@@ -173,23 +167,47 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, on
                 }
                 <Box flexGrow={1} />
                 <Box display="flex" flexDirection="row" >
-                    <Tooltip title="copy link">
-                        <IconButton onClick={() => {
+                    {
+                        post.post_type_id == 1 &&
+                        <Tooltip title="copy link">
+                            <IconButton onClick={() => {
+                                navigator.clipboard.writeText(window.location.toString())
+                                setClipboardOpen(true);
+                            }}>
+                                {/* <Box component="img" src="/icons/copy.svg" alt="views" height={20}/> */}
+                                <ContentCopy className={style.action_icon} />
+                            </IconButton>
+                        </Tooltip>
+                    }
 
-                        }}>
-                            {/* <Box component="img" src="/icons/copy.svg" alt="views" height={20}/> */}
-                            <ContentCopy className={style.action_icon} />
-                        </IconButton>
-                    </Tooltip>
+                    <InfoSnackBar message="link copied to clipboard" open={clipboardOpen} setOpen={setClipboardOpen} />
 
-                    <Tooltip title="comment">
-                        <IconButton onClick={comment}>
-                            {/* <Box component="img" src="/icons/reply.svg" alt="comment" height={20}/> */}
-                            <Reply className={style.action_icon} />
-                        </IconButton>
-                    </Tooltip>
                     {
                         isLoggedIn &&
+                        <Box>
+                            <Tooltip title="comment">
+                                <IconButton onClick={() => {
+                                    setCommentDialogOpen(true)
+                                }}>
+                                    <Reply className={style.action_icon} />
+                                </IconButton>
+                            </Tooltip>
+                            <InputDialog
+                                width="100%"
+                                onCancel={() => {setCommentDialogOpen(false)}}
+                                onSubmit={() => {
+                                    setCommentDialogOpen(false);
+                                    submitComment(comment, post.id)
+                                }}
+                                onChange={(e) => {
+                                    setComment(e.target.value)
+                                }}
+                                open={commentDialogOpen}
+                            />
+                        </Box>
+                    }
+                    {
+                        isLoggedIn && post.post_type_id == 1 &&
                         <Tooltip title="answer">
                             <IconButton onClick={() => {
                                 onAnswer(post.id)
@@ -218,11 +236,11 @@ export function Post({post, accepted_answer_id, isLoggedIn, userId, onAnswer, on
 }
 
 
-export default function PostView({post, comments, accepted_answer_id, isLoggedIn, userId, onAnswer, onEdit}) {
+export default function PostView({comments, ...props}) {
     return (
         <Box>
             <Box sx={{p: 1}} className={style.white_bg} >
-                <Post post={post} accepted_answer_id={accepted_answer_id} isLoggedIn={isLoggedIn} userId={userId} onAnswer={onAnswer} onEdit={onEdit} />
+                <Post {...props} />
             </Box>
             <Divider component="div" sx={{ borderTopWidth: 1, borderColor: "ActiveBorder" }} />
             <Box display="flex" flexDirection="row">
