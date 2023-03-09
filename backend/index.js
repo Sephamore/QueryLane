@@ -16,7 +16,7 @@ try {
    console.error('Connection error:', error);
 }
 app.use(cors({
-   origin: ["http://127.0.0.1:3000", "http://20.193.230.163:3000"],
+   origin: ["http://127.0.0.1:3000", "http://20.193.230.163:3000", "http://localhost:3000"],
    credentials: true,
 }));
 app.use(sessions({
@@ -24,9 +24,11 @@ app.use(sessions({
    saveUninitialized: true,
    cookie: {
       maxAge: 24*60*60*100000,
-      secure: false
+      secure: false,
+      sameSite: "none",
+      httpOnly: true
    },
-   resave: false
+   resave: false,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

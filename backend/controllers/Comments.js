@@ -21,6 +21,8 @@ export const createComment = async (req, res) => {
     try {
         req.body.creation_date = new Date();
         req.body.id = await CommentsModel.max("id") + 1;
+        req.body.score = 0;
+        req.body.content_license = "CC BY-SA 3.0";
         await CommentsModel.create( req.body );
         res.json({
             message: "Comment Created"

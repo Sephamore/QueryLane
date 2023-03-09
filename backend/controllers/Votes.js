@@ -54,6 +54,12 @@ const recalcPostScore = async (postid) => {
 export const votePost = async (req, res) => {
     // const username = req.session.username;
     //handles upvotes and downvotes
+
+    if(req.session.userId !== req.body.user_id)
+    {
+        throw {message: "user_id not same as current user"};
+    };
+
     const type_id = req.body.vote_type_id;
     if( type_id == 2 || type_id == 3){
      try {

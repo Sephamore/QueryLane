@@ -54,6 +54,20 @@ const postBelongs = async (postid, userid) => {
     }
 }
 
+const updateAnswerCount = async (postid, delta) => {
+    try {
+        PostsModel.increment(
+            { answer_count: delta },
+            { where: { id: postid } }
+          );
+        res.json({
+            message: "Answer Count incremented"
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }   
+}
+
 //in progress
 export const createPost = async (req, res) => {
     // console.log("creating")
@@ -78,6 +92,10 @@ export const createPost = async (req, res) => {
             id: content.id,
             status: "OK"
         });
+
+        if(content.post_type_id === 2 && content.parent_id != null){
+            updateAnswerCount(content.parent_id, 1); //increment
+        }
     }
     catch (error) {
         res.json({ message: error.message, status: "Error" });
@@ -96,6 +114,7 @@ export const updatePost = async (req, res) => {
         let newData = req.body;
         // newData.keys(values).forEach( (key) => {
         //   if (values[key] === undefined) {delete values[key];}        // handle undefined
+        //   if (values[key] === null){values[key] === "";}              // use empty string instead of nulls
         //   if (values[key] === null){values[key] === "";}              // use empty string instead of nulls
         // }); 
 
@@ -123,6 +142,16 @@ export const deletePost = async (req, res) => {
         {
             throw {message: "post owner_user_id not same as current user"};
         };
+
+        let post = await PostsModel.findOne({
+            where: {
+                id: postid
+            }, 
+        });
+
+        if(post.post_type_id === 2 && post.parent_id != null){
+            updateAnswerCount(post.parent_id, -1); //decrement
+        }
 
         await PostsModel.update({
             body: "Deleted",
