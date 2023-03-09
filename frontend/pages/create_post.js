@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import TextField from "@mui/material/TextField";
 import TopBar from "@/components/topBar";
 import { backend } from "@/query.config";
+import { Autocomplete } from '@mui/material';
+
 
 axios.defaults.withCredentials = true
 
@@ -16,6 +18,28 @@ export default function CreatePost() {
     const [ username, setUsername ] = useState("")
     const [ userDisplayName, setUserDisplayName ] = useState("")
     const [ userId, setUserId ] = useState("")
+    const [ allTags, setAllTags ] = useState([])
+    const [ tags, setTags ] = useState("")
+
+    useEffect(() => {
+        const getTags = async () => {
+          try {
+            const res = await axios.get(`${backend}/tags/get`)
+            const data = res.data.map((tag) => {
+              return {
+                name: tag.tag_name,
+                id: tag.id.toString(),
+                type: "tag"
+              }
+            })
+            setAllTags(data);
+          } catch (e) {
+            console.log(e)
+          }
+        }
+        if (allTags.length == 0)
+            getTags();
+    })
 
     const router = useRouter();
 
@@ -37,7 +61,6 @@ export default function CreatePost() {
                 console.log(e)
             }
         }
-
         setter();
     });
     const submit = async () => {
@@ -46,7 +69,7 @@ export default function CreatePost() {
             post_type_id: "1",
             owner_display_name: userDisplayName || null,
             title: title,
-            tags: "",
+            tags: tags,
             body: post
         }
         console.log(data)
@@ -62,7 +85,7 @@ export default function CreatePost() {
         <Box>
             <TopBar isLoggedIn={isLoggedIn} username={username} userDisplayName={userDisplayName} userId={userId} setIsLoggedIn={setIsLoggedIn} />
             <Box sx = {{ flexDirection: "column", display: "flex", alignItems: "center",}}>
-                <Box sx = {{ my: 3 }} width="80%" maxWidth={700}>
+                <Box sx = {{ my: 3 }} width="80%" minWidth="max-content">
                     <TextField
                         label="Title"
                         fullWidth
@@ -72,11 +95,22 @@ export default function CreatePost() {
                         }}
                     />
                 </Box>
-                <Box maxWidth="80%">
+                <Box maxWidth="80%"sx={{ backgroundColor: "blue" }}>
                     <RTE
                         onChange={(value) => {
                             setPost(value);
                             console.log(value);
+                        }}
+                    />
+                </Box>
+                <Box sx={{ mt: 1, width: "80%" }} >
+                    <Autocomplete
+                        multiple
+                        getOptionLabel={(option) => (option.name)}
+                        options={allTags}
+                        renderInput={(params) => <TextField {...params} label="Choose tags" />}
+                        onChange={(_, value) => {
+                            setTags(value.map(tag => `<${tag.name}>`).join(""));
                         }}
                     />
                 </Box>

@@ -6,14 +6,9 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
@@ -21,7 +16,6 @@ import style from '@/styles/topBar.module.css'
 import { useRouter } from 'next/router';
 import { backend } from '@/query.config';
 import axios from 'axios';
-import { Autocomplete, TextField } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { Select } from "@mui/material"
 
@@ -78,7 +72,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function TopBar({ showSearchBar, isLoggedIn, username, userDisplayName, userId, setIsLoggedIn, selected, setSelected, setShowSearchResults, options, setOptions, searchInputValue, setSearchInputValue, orderBy, setOrderBy}) {
 
   const [ allTags, setAllTags ] = useState([])
-  const [ tags, setTags ] = useState([])
   const [ users, setUsers ] = useState([])
   // const [ options, setOptions ] = useState([])
   const [ value, setValue ] = useState([])
@@ -109,7 +102,6 @@ export default function TopBar({ showSearchBar, isLoggedIn, username, userDispla
         })
         setAllTags(data);
         setOptions(users.concat(allTags))
-        console.log("ops", options)
       } catch (e) {
 
       }

@@ -41,7 +41,7 @@ function FlexiblePost(props) {
                 </Paper>
             }
             <Paper
-                sx={{width: {xs: "95%", sm: "85%", md: "75%", lg: "65%", xl: "55%" }, pb: 0}}
+                sx={{width: {xs: "95%", sm: "85%", md: "75%", lg: "65%", xl: "55%" }, pb: 0, minWidth: "min-content"}}
                 elevation={10}
                 className={style.comment_background}
             >
@@ -71,6 +71,7 @@ export default function Posts() {
     const [ editingId, setEditingId ] = useState(0)
     const [ action, setAction ] = useState("")
     const [ rteDefaultValue, setRteDefaultValue ] = useState("<p><br></p>")
+    const [ tags, setTags ] = useState("")
 
     useEffect(() => {
         const setter = async () => {
@@ -142,6 +143,7 @@ export default function Posts() {
         setDialogOpen(true)
         setEditingId(id)
         setRteDefaultValue(data)
+        setPost(data)
         setAction("edit")
     }
 
@@ -149,16 +151,20 @@ export default function Posts() {
         const data = {
             owner_user_id: userId,
             owner_display_name: userDisplayName || "",
-            tags: "",
             body: post,
         }
         if (action == "answer"){
             data.post_type_id = '2';
-            data.parent_id = parentId
-            const res = await axios.post(`${backend}/posts/create`, data)
-            console.log("create ", res.data)
+            data.parent_id = parentId;
+            data.tags=""
+            const res = await axios.post(`${backend}/posts/create`, data);
+            // console.log("create ", res.data)
         }
         if (action == "edit") {
+            console.log(data)
+            if (tags != "")
+                data.tags = tags;
+            setTags("")
             data.id = editingId;
             const res = await axios.patch(`${backend}/posts/update`, data)
             console.log("update ", res.data)
@@ -253,6 +259,10 @@ export default function Posts() {
                 setPost(value);
             }}
             defaultValue={rteDefaultValue}
+            showTagSelector={ action == "edit" && editingId == id}
+            onTagSelect={(value) => {
+                setTags(value);
+            }}
         />
 
     </>
