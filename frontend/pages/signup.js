@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -12,10 +10,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { back_ip, back_port } from '@/utils/settings';
 import { useState } from 'react'
 import style from '@/styles/signup.module.css'
-import { Password } from '@mui/icons-material';
 import { backend } from '@/query.config';
 import { useRouter } from 'next/router';
 import axios from 'axios';
@@ -33,6 +29,16 @@ export default function SignUp() {
     const [password, setPassword] = useState("")
     const [repassword, setRepassword] = useState("")
     const [usernameAvailable, setUsernameAvailable] = useState(true)
+
+    const checkUserName = async (name) => {
+        const res = await axios.get(`${backend}/isNameAvailable/${name}`);
+        if (res.data.status == "OK") {
+            setUsernameAvailable(true)
+        } else {
+            setUsernameAvailable(false)
+        }
+        console.log(res.data)
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -56,8 +62,6 @@ export default function SignUp() {
             if(createUser.data.status === 'OK') {
                 await router.push('/');
             }
-        } else {
-            // Abhinav dekh le
         }
     };
 
@@ -121,8 +125,12 @@ export default function SignUp() {
                                 value={username}
                                 onChange={(e) => {
                                     setUsername(e.target.value);
+                                    checkUserName(e.target.value)
                                 }}
                                 />
+                                <Box style={{ color: "red" }}>
+                                    { !usernameAvailable && "username not available" }
+                                </Box>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
@@ -165,15 +173,18 @@ export default function SignUp() {
                                 />
                             </Grid> */}
                         </Grid>
-                        {!passwordMatch && repassword != "" && <div className={style.no_pass_match}>
-                            passwords do not match
-                        </div>}
+                        {
+                            !passwordMatch && repassword != "" && 
+                            <div className={style.no_pass_match}>
+                                passwords do not match
+                            </div>
+                        }
                         <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        disabled={ (password != repassword) || firstName == "" || lastName == "" || username == "" || password == "" }
+                        disabled={ (password != repassword) || firstName == "" || lastName == "" || username == "" || password == "" || !usernameAvailable }
                         >
                         Sign Up
                         </Button>
