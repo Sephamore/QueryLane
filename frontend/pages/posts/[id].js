@@ -139,7 +139,6 @@ export default function Posts() {
     }
 
     const editPost = async (id, data) => {
-        // console.log(data)
         setDialogOpen(true)
         setEditingId(id)
         setRteDefaultValue(data)
@@ -158,7 +157,6 @@ export default function Posts() {
             data.parent_id = parentId;
             data.tags=""
             const res = await axios.post(`${backend}/posts/create`, data);
-            // console.log("create ", res.data)
         }
         if (action == "edit") {
             console.log(data)
@@ -188,7 +186,7 @@ export default function Posts() {
     const likePost = (post_id) => {
         console.log("like")
     }
-    
+
     const dislikePost = (post_id) => {
         console.log("dislike")
     }
